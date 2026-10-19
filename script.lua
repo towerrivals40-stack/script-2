@@ -1,26 +1,23 @@
 -- Загрузка стабильной библиотеки Kavo UI (основа Obsidian)
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
 
--- Настройка темы (Делаем её максимально похожей на Obsidian/Resonance)
+-- Настройка темы
 local Window = Library.CreateLib("Project Resonance v2.9 | FTAP", "DarkTheme")
 
--- Создаем вкладки (слева с иконками)
+-- Создаем вкладки
 local TargetTab = Window:NewTab("Target")
 local MethodTab = Window:NewTab("Method Settings")
 local AntisTab = Window:NewTab("Antis")
 local SettingsTab = Window:NewTab("Settings")
 
--- Секции для Target
+-- Секции
 local TargetSection = TargetTab:NewSection("Target")
 local ApplySection = TargetTab:NewSection("Apply")
-
--- Секции для Method
 local MethodSection = MethodTab:NewSection("Methods")
 local KickSettings = MethodTab:NewSection("Kick Settings")
-
--- Секции для Antis
 local AntisSection = AntisTab:NewSection("Protection Modules")
 local LagSection = AntisTab:NewSection("Lag & Performance")
+local SettingsSection = SettingsTab:NewSection("Script Settings")
 
 -- Сервисы и переменные
 local Players = game:GetService("Players")
@@ -28,9 +25,11 @@ local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 local Workspace = game:GetService("Workspace")
 local UserInputService = game:GetService("UserInputService")
+local CoreGui = game:GetService("CoreGui")
 
+-- Флаги состояния
+local isUnloaded = false
 local targetName = ""
-local isKicking = false
 local loopRagdoll = false
 local removeAntiKick = true
 local kickHeight = 500
@@ -41,7 +40,10 @@ local isAntiExplosion = true
 local isAntiKick = true
 local isAntiLag = true
 
--- ================= ЛОГИКА КИКА (Blobman Kick) =================
+-- Таблица для хранения соединений (чтобы потом отключить)
+local Connections = {}
+
+-- ================= ЛОГИКА КИКА =================
 local function getTarget()
     if targetName ~= "" then
         local target = Players:FindFirstChild(targetName)
@@ -85,7 +87,8 @@ end
 
 -- 1. Anti Network Ownership
 task.spawn(function()
-    while task.wait(0.1) do
+    while not isUnloaded do
+        task.wait(0.1)
         if isAntiNetwork and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
             local hrp = LocalPlayer.Character.HumanoidRootPart
             pcall(function()
@@ -98,8 +101,8 @@ task.spawn(function()
 end)
 
 -- 2. Anti Blobman / Fling
-RunService.Heartbeat:Connect(function()
-    if not isAntiBlobman then return end
+Connections.Heartbeat1 = RunService.Heartbeat:Connect(function()
+    if isUnloaded or not isAntiBlobman then return end
     local char = LocalPlayer.Character
     if not char then return end
     local hrp = char:FindFirstChild("HumanoidRootPart")
@@ -122,8 +125,8 @@ RunService.Heartbeat:Connect(function()
 end)
 
 -- 3. Anti Void
-RunService.Heartbeat:Connect(function()
-    if not isAntiVoid then return end
+Connections.Heartbeat2 = RunService.Heartbeat:Connect(function()
+    if isUnloaded or not isAntiVoid then return end
     local char = LocalPlayer.Character
     if char and char:FindFirstChild("HumanoidRootPart") then
         if char.HumanoidRootPart.Position.Y < -100 then
@@ -133,8 +136,8 @@ RunService.Heartbeat:Connect(function()
 end)
 
 -- 4. Anti Explosion
-Workspace.DescendantAdded:Connect(function(obj)
-    if not isAntiExplosion then return end
+Connections.DescendantAdded = Workspace.DescendantAdded:Connect(function(obj)
+    if isUnloaded or not isAntiExplosion then return end
     if obj:IsA("Explosion") or obj:IsA("Fire") or obj.Name == "Void" then
         task.wait(0.05)
         pcall(function() obj:Destroy() end)
@@ -148,7 +151,7 @@ if isAntiKick then
     setreadonly(mt, false)
     mt.__namecall = newcclosure(function(self, ...)
         local method = getnamecallmethod()
-        if method == "Kick" and isAntiKick then
+        if method == "Kick" and isAntiKick and not isUnloaded then
             return
         end
         return oldNamecall(self, ...)
@@ -158,7 +161,8 @@ end
 
 -- 6. Anti Lag
 task.spawn(function()
-    while task.wait(5) do
+    while not isUnloaded do
+        task.wait(5)
         if isAntiLag then
             for _, v in pairs(Workspace:GetDescendants()) do
                 if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Smoke") then
@@ -187,9 +191,7 @@ ApplySection:NewButton("Apply Method Selected", "Кикнуть цель", funct
 end)
 
 -- Method Tab
-MethodSection:NewDropdown("MethodDropdown", "Methods", {"Kick", "Destroy Food", "Remove Gucci"}, function(currentOption)
-    -- Заглушка
-end)
+MethodSection:NewDropdown("MethodDropdown", "Methods", {"Kick", "Destroy Food", "Remove Gucci"}, function(currentOption) end)
 
 KickSettings:NewToggle("AntiKick", "Remove Anti-Kick", function(state)
     removeAntiKick = state
@@ -205,25 +207,15 @@ KickSettings:NewButton("TPVoid", "TP To Void Platform", function()
     end
 end)
 
--- Antis Tab (Как на твоем скрине)
+-- Antis Tab
 AntisSection:NewToggle("AntiGrab", "Anti Grab", function(state) end)
 AntisSection:NewToggle("GucciAntiGrab", "[GUCCI] Anti Grab", function(state) end)
-AntisSection:NewToggle("AntiBlobman", "Anti Blobman", function(state)
-    isAntiBlobman = state
-end)
-AntisSection:NewToggle("AntiNetwork", "Anti Network Ownership", function(state)
-    isAntiNetwork = state
-end)
-AntisSection:NewToggle("AntiExplosion", "Anti Explosion", function(state)
-    isAntiExplosion = state
-end)
+AntisSection:NewToggle("AntiBlobman", "Anti Blobman", function(state) isAntiBlobman = state end)
+AntisSection:NewToggle("AntiNetwork", "Anti Network Ownership", function(state) isAntiNetwork = state end)
+AntisSection:NewToggle("AntiExplosion", "Anti Explosion", function(state) isAntiExplosion = state end)
 AntisSection:NewToggle("AntiBurn", "Anti Burn", function(state) end)
-AntisSection:NewToggle("AntiVoid", "Anti Void", function(state)
-    isAntiVoid = state
-end)
-AntisSection:NewToggle("AntiKick", "Anti Kick", function(state)
-    isAntiKick = state
-end)
+AntisSection:NewToggle("AntiVoid", "Anti Void", function(state) isAntiVoid = state end)
+AntisSection:NewToggle("AntiKick", "Anti Kick", function(state) isAntiKick = state end)
 AntisSection:NewToggle("BreakPCLD", "[Break PCLD] Anti Kick", function(state) end)
 AntisSection:NewToggle("AntiSticky", "Anti Sticky", function(state) end)
 AntisSection:NewToggle("AntiSnowball", "Anti Snowball", function(state) end)
@@ -232,21 +224,44 @@ AntisSection:NewToggle("AntiPaint", "Anti Paint", function(state) end)
 AntisSection:NewToggle("AntiPoison", "Anti Poison", function(state) end)
 
 -- Lag Section
-LagSection:NewToggle("AntiLag", "Anti Lag", function(state)
-    isAntiLag = state
-end)
+LagSection:NewToggle("AntiLag", "Anti Lag", function(state) isAntiLag = state end)
 LagSection:NewToggle("AutoAntiLag", "Auto Anti Lag", function(state) end)
 LagSection:NewToggle("AntiInvis", "Anti Invis", function(state) end)
 LagSection:NewToggle("AutoReset", "Auto Reset", function(state) end)
 
+-- Settings Section (Кнопка выгрузки)
+SettingsSection:NewButton("Unload Script", "Полностью выгружает скрипт и закрывает меню", function()
+    isUnloaded = true -- Останавливаем все циклы
+    
+    -- Отключаем все соединения
+    for _, conn in pairs(Connections) do
+        if typeof(conn) == "RBXScriptConnection" then
+            conn:Disconnect()
+        end
+    end
+    
+    -- Уничтожаем GUI
+    local kavoGui = CoreGui:FindFirstChild("KavoUI")
+    if kavoGui then
+        kavoGui:Destroy()
+    end
+    
+    -- Восстанавливаем метатаблицу (если нужно)
+    if getrawmetatable and isAntiKick then
+        local mt = getrawmetatable(game)
+        setreadonly(mt, false)
+        mt.__namecall = nil -- Сбрасываем хук
+        setreadonly(mt, true)
+    end
+end)
+
 -- ================= БИНД НА TAB =================
 local uiVisible = true
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
-    if gameProcessed then return end
+Connections.InputBegan = UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed or isUnloaded then return end
     if input.KeyCode == Enum.KeyCode.Tab then
         uiVisible = not uiVisible
-        -- В Kavo UI главный фрейм называется "KavoUI"
-        local kavoGui = game:GetService("CoreGui"):FindFirstChild("KavoUI")
+        local kavoGui = CoreGui:FindFirstChild("KavoUI")
         if kavoGui then
             local mainFrame = kavoGui:FindFirstChild("MainFrame") or kavoGui:FindFirstChild("Main")
             if mainFrame then
@@ -256,5 +271,4 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
     end
 end)
 
--- Уведомление
-Library:Notify("Защита активирована! Нажми TAB, чтобы скрыть меню.", 5)
+Library:Notify("Скрипт загружен! Нажми TAB, чтобы скрыть меню.", 5)
