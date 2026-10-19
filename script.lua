@@ -1,10 +1,10 @@
--- Загрузка стабильной библиотеки Kavo UI (основа Obsidian)
+-- Загрузка стабильной библиотеки Kavo UI
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
 
 -- Настройка темы
 local Window = Library.CreateLib("Project Resonance v2.9 | FTAP", "DarkTheme")
 
--- Создаем вкладки
+-- Вкладки
 local TargetTab = Window:NewTab("Target")
 local MethodTab = Window:NewTab("Method Settings")
 local AntisTab = Window:NewTab("Antis")
@@ -31,7 +31,6 @@ local CoreGui = game:GetService("CoreGui")
 local isUnloaded = false
 local targetName = ""
 local loopRagdoll = false
-local removeAntiKick = true
 local kickHeight = 500
 local isAntiBlobman = true
 local isAntiNetwork = true
@@ -40,8 +39,9 @@ local isAntiExplosion = true
 local isAntiKick = true
 local isAntiLag = true
 
--- Таблица для хранения соединений (чтобы потом отключить)
+-- Таблица соединений
 local Connections = {}
+local oldNamecall = nil -- Сюда сохраним оригинальную функцию игры
 
 -- ================= ЛОГИКА КИКА =================
 local function getTarget()
@@ -83,9 +83,9 @@ local function executeKick()
     end
 end
 
--- ================= ЛОГИКА ЗАЩИТЫ (Antis) =================
+-- ================= ЛОГИКА ЗАЩИТЫ =================
 
--- 1. Anti Network Ownership
+-- 1. Anti Network
 task.spawn(function()
     while not isUnloaded do
         task.wait(0.1)
@@ -100,7 +100,7 @@ task.spawn(function()
     end
 end)
 
--- 2. Anti Blobman / Fling
+-- 2. Anti Blobman
 Connections.Heartbeat1 = RunService.Heartbeat:Connect(function()
     if isUnloaded or not isAntiBlobman then return end
     local char = LocalPlayer.Character
@@ -144,10 +144,10 @@ Connections.DescendantAdded = Workspace.DescendantAdded:Connect(function(obj)
     end
 end)
 
--- 5. Anti Kick (Packet Protect)
+-- 5. Anti Kick (Хук)
 if isAntiKick then
     local mt = getrawmetatable(game)
-    local oldNamecall = mt.__namecall
+    oldNamecall = mt.__namecall -- Сохраняем оригинал
     setreadonly(mt, false)
     mt.__namecall = newcclosure(function(self, ...)
         local method = getnamecallmethod()
@@ -178,29 +178,13 @@ end)
 -- ================= UI ЭЛЕМЕНТЫ =================
 
 -- Target Tab
-TargetSection:NewTextBox("TargetName", "Targets", function(txt)
-    targetName = txt
-end)
-
-ApplySection:NewToggle("LoopRagdoll", "Loop Apply Method Selected", function(state)
-    loopRagdoll = state
-end)
-
-ApplySection:NewButton("Apply Method Selected", "Кикнуть цель", function()
-    executeKick()
-end)
+TargetSection:NewTextBox("TargetName", "Targets", function(txt) targetName = txt end)
+ApplySection:NewToggle("LoopRagdoll", "Loop Apply Method Selected", function(state) loopRagdoll = state end)
+ApplySection:NewButton("Apply Method Selected", "Кикнуть цель", function() executeKick() end)
 
 -- Method Tab
 MethodSection:NewDropdown("MethodDropdown", "Methods", {"Kick", "Destroy Food", "Remove Gucci"}, function(currentOption) end)
-
-KickSettings:NewToggle("AntiKick", "Remove Anti-Kick", function(state)
-    removeAntiKick = state
-end)
-
-KickSettings:NewSlider("KickHeight", "Kick Height", 1000, 10, function(value)
-    kickHeight = value
-end)
-
+KickSettings:NewSlider("KickHeight", "Kick Height", 1000, 10, function(value) kickHeight = value end)
 KickSettings:NewButton("TPVoid", "TP To Void Platform", function()
     if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
         LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(0, -500, 0)
@@ -208,51 +192,55 @@ KickSettings:NewButton("TPVoid", "TP To Void Platform", function()
 end)
 
 -- Antis Tab
-AntisSection:NewToggle("AntiGrab", "Anti Grab", function(state) end)
-AntisSection:NewToggle("GucciAntiGrab", "[GUCCI] Anti Grab", function(state) end)
 AntisSection:NewToggle("AntiBlobman", "Anti Blobman", function(state) isAntiBlobman = state end)
 AntisSection:NewToggle("AntiNetwork", "Anti Network Ownership", function(state) isAntiNetwork = state end)
 AntisSection:NewToggle("AntiExplosion", "Anti Explosion", function(state) isAntiExplosion = state end)
-AntisSection:NewToggle("AntiBurn", "Anti Burn", function(state) end)
 AntisSection:NewToggle("AntiVoid", "Anti Void", function(state) isAntiVoid = state end)
 AntisSection:NewToggle("AntiKick", "Anti Kick", function(state) isAntiKick = state end)
-AntisSection:NewToggle("BreakPCLD", "[Break PCLD] Anti Kick", function(state) end)
-AntisSection:NewToggle("AntiSticky", "Anti Sticky", function(state) end)
-AntisSection:NewToggle("AntiSnowball", "Anti Snowball", function(state) end)
-AntisSection:NewToggle("AntiBanana", "Anti Banana", function(state) end)
-AntisSection:NewToggle("AntiPaint", "Anti Paint", function(state) end)
-AntisSection:NewToggle("AntiPoison", "Anti Poison", function(state) end)
 
 -- Lag Section
 LagSection:NewToggle("AntiLag", "Anti Lag", function(state) isAntiLag = state end)
-LagSection:NewToggle("AutoAntiLag", "Auto Anti Lag", function(state) end)
-LagSection:NewToggle("AntiInvis", "Anti Invis", function(state) end)
-LagSection:NewToggle("AutoReset", "Auto Reset", function(state) end)
 
--- Settings Section (Кнопка выгрузки)
-SettingsSection:NewButton("Unload Script", "Полностью выгружает скрипт и закрывает меню", function()
-    isUnloaded = true -- Останавливаем все циклы
+-- ================= КНОПКА UNLOAD =================
+SettingsSection:NewButton("Unload Script", "Полностью выгружает скрипт", function()
+    isUnloaded = true -- Останавливаем циклы
     
-    -- Отключаем все соединения
+    -- 1. Отключаем все соединения
     for _, conn in pairs(Connections) do
-        if typeof(conn) == "RBXScriptConnection" then
-            conn:Disconnect()
+        pcall(function() conn:Disconnect() end)
+    end
+    
+    -- 2. Возвращаем оригинальный __namecall (чтобы игра не зависла)
+    if oldNamecall then
+        local mt = getrawmetatable(game)
+        setreadonly(mt, false)
+        mt.__namecall = oldNamecall
+        setreadonly(mt, true)
+    end
+    
+    -- 3. Ищем и удаляем GUI во всех возможных местах
+    local guiNames = {"KavoUI", "Obsidian"}
+    for _, name in ipairs(guiNames) do
+        -- В CoreGui
+        local cg = CoreGui:FindFirstChild(name)
+        if cg then cg:Destroy() end
+        
+        -- В PlayerGui
+        local pg = LocalPlayer:FindFirstChild("PlayerGui")
+        if pg then
+            local pgGui = pg:FindFirstChild(name)
+            if pgGui then pgGui:Destroy() end
+        end
+        
+        -- В gethui (защищенная папка экзекутора)
+        if gethui then
+            local hui = gethui():FindFirstChild(name)
+            if hui then hui:Destroy() end
         end
     end
     
-    -- Уничтожаем GUI
-    local kavoGui = CoreGui:FindFirstChild("KavoUI")
-    if kavoGui then
-        kavoGui:Destroy()
-    end
-    
-    -- Восстанавливаем метатаблицу (если нужно)
-    if getrawmetatable and isAntiKick then
-        local mt = getrawmetatable(game)
-        setreadonly(mt, false)
-        mt.__namecall = nil -- Сбрасываем хук
-        setreadonly(mt, true)
-    end
+    -- Уведомление об успешной выгрузке
+    print("Скрипт успешно выгружен!")
 end)
 
 -- ================= БИНД НА TAB =================
@@ -261,7 +249,7 @@ Connections.InputBegan = UserInputService.InputBegan:Connect(function(input, gam
     if gameProcessed or isUnloaded then return end
     if input.KeyCode == Enum.KeyCode.Tab then
         uiVisible = not uiVisible
-        local kavoGui = CoreGui:FindFirstChild("KavoUI")
+        local kavoGui = CoreGui:FindFirstChild("KavoUI") or LocalPlayer.PlayerGui:FindFirstChild("KavoUI")
         if kavoGui then
             local mainFrame = kavoGui:FindFirstChild("MainFrame") or kavoGui:FindFirstChild("Main")
             if mainFrame then
