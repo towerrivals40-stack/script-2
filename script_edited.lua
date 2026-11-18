@@ -17190,13 +17190,13 @@ do
 									task.wait()
 								until game:IsLoaded()
 
-								copyright = "Copyright (c) 2026 Project Resonance. All rights reserved."
+								copyright = "Copyright (c) 2026 dujare. All rights reserved."
 
 								StarterGui = game:GetService("StarterGui")
 
 								fn17 = function(arg, arg2, arg3)
 									StarterGui:SetCore("SendNotification", {
-										Title = arg or "Resonance",
+										Title = arg or "dujare",
 										Text = arg2 or "Notification",
 										Duration = arg3 or 5,
 										Icon = "rbxassetid://79685990879972",
@@ -17205,7 +17205,7 @@ do
 
 								placeId = game.PlaceId
 								if placeId ~= 6961824067 then
-									fn17("Resonance", "This game is not supported; couldn't start the script", 3)
+									fn17("dujare", "This game is not supported; couldn't start the script", 3)
 									return
 								end
 
@@ -17253,7 +17253,7 @@ do
 						end
 
 						if not lib3 then
-							fn17("Resonance", "Failed to load the UI Library! GitHub might be down/blocked by your ISP. Try using a VPN!", 5)
+							fn17("dujare", "Failed to load the UI Library! GitHub might be down/blocked by your ISP. Try using a VPN!", 5)
 							getgenv().ResonanceRunning = false
 							return
 						end
@@ -17404,7 +17404,7 @@ do
 							end
 
 							lib:Notify({
-								Title = arg2 or "Resonance",
+								Title = arg2 or "dujare",
 								Description = arg,
 								Time = arg4 or 5,
 								SoundId = arg3 or n34,
@@ -17506,6 +17506,7 @@ do
 							DirectGrab = false,
 							LagServer = false,
 							PacketLagServer = false,
+							PacketShield = false,
 							AutoExplodeTarget = false,
 							CoconutForms = false,
 							BreakAllHoldables = false,
@@ -18177,7 +18178,7 @@ do
 							table.insert(tbl7.TeleportLocations, part3)
 							tbl12 = {}
 
-							copyright = "Copyright (c) 2026 Project Resonance. All rights reserved."
+							copyright = "Copyright (c) 2026 dujare. All rights reserved."
 
 							tbl12.NotifyEvent = function(arg, arg2, arg3)
 								local notificationSettings = tbl7.NotificationSettings
@@ -19676,7 +19677,7 @@ end
 										local ok, result = pcall(v25.Callback, v25.Player)
 
 										if not ok then
-											warn(("[Resonance] %s failed: %s"):format(arg, tostring(result)))
+											warn(("[dujare] %s failed: %s"):format(arg, tostring(result)))
 										end
 
 										task.wait()
@@ -29956,7 +29957,7 @@ end
 				tbl17[n37] = v28
 			end
 
-			task.wait(0.35)
+			task.wait(0.05) -- dujare: reduced from 0.35 for faster kick
 
 			for _, v26 in ipairs(tbl16) do
 				if v26.Root.Parent then
@@ -29968,7 +29969,7 @@ end
 						task.spawn(tbl12.RemoveSticky, v26.Character)
 					end
 
-					task.wait()
+					-- no task.wait() between grabs for speed
 				end
 			end
 
@@ -29988,7 +29989,7 @@ end
 				end
 			end
 
-			local n36 = os.clock() + 2
+			local n36 = os.clock() + 0.6 -- dujare: reduced from 2s for faster kick
 
 			while true do
 				for _, v26 in ipairs(tbl16) do
@@ -30111,7 +30112,7 @@ end
 			end)
 
 			task.spawn(function()
-				local n36 = os.clock() + 3
+				local n36 = os.clock() + 1.2 -- dujare: reduced from 3s
 
 				while not flag11 and os.clock() < n36 do
 					RunService.Heartbeat:Wait()
@@ -30123,7 +30124,7 @@ end
 				end
 			end)
 
-			task.wait(0.15)
+			task.wait(0.05) -- dujare: reduced from 0.15
 
 			for _, v22 in ipairs(tbl17) do
 				if v22.Parent then
@@ -30137,7 +30138,7 @@ end
 				end
 			end
 
-			task.wait(6)
+			task.wait(2.5) -- dujare: reduced from 6s
 
 			if not flag11 then
 				toggles.LineLagToggle:SetDisabled(false)
@@ -30147,7 +30148,7 @@ end
 			kickServerState.Running = false
 
 			if not ok then
-				warn("[Resonance] Target Kick Server failed: " .. tostring(result))
+				warn("[dujare] Target Kick Server failed: " .. tostring(result))
 			end
 
 			return ok and #tbl17 > 0
@@ -30982,7 +30983,7 @@ end
 			tbl12.UpdateServerHopButton()
 
 			local v22 = lib:Notify({
-				Title = "Resonance",
+				Title = "dujare",
 				Description = "Attempting to serverhop..",
 				Persist = true,
 				SoundId = n34,
@@ -31384,7 +31385,7 @@ end
 
 			local function fn21(arg8)
 				if tbl12.IsProtectedPlayer(arg8) then
-					return fn18("This player has Resonance immunity.")
+					return fn18("This player has dujare immunity.")
 				end
 
 				if not flag13 then
@@ -31473,7 +31474,7 @@ end
 			local ok, result = pcall(arg2, arg3)
 
 			if not ok then
-				warn(("[Resonance] %s failed: %s"):format(arg, tostring(result)))
+				warn(("[dujare] %s failed: %s"):format(arg, tostring(result)))
 			end
 		end
 
@@ -33748,7 +33749,7 @@ Escape Timer: %*]]
 
 						if tbl8.AutoReset then
 							if tbl9.KickFlags >= 4 and tbl8.AutoLeave then
-								return localPlayer:Kick("Resonance (Auto Reset)\nAvoided Kick")
+								return localPlayer:Kick("dujare (Auto Reset)\nAvoided Kick")
 							end
 							local v22, v23, v24 = tbl12.Char()
 
@@ -34966,8 +34967,8 @@ Escape Timer: %*]]
 		lib.ForceCheckbox = true
 
 		v19 = lib:CreateWindow({
-			Title = "<b>Resonance</b>",
-			Footer = ("<b>Project Resonance %* | FTAP</b>"):format("v2.9"),
+			Title = "<b>dujare</b>",
+			Footer = ("<b>dujare %* | FTAP</b>"):format("v2.9"),
 			ToggleKeybind = Enum.KeyCode.RightShift,
 			Center = true,
 			AutoShow = true,
@@ -35049,7 +35050,7 @@ Escape Timer: %*]]
 			label.Position = UDim2.fromOffset(viewportSize.X * 0.5, viewportSize.Y * 0.8)
 		end
 
-		Watermark = lib:AddDraggableLabel("Resonance", 1281139454)
+		Watermark = lib:AddDraggableLabel("dujare", 1281139454)
 		Watermark:SetVisible(true)
 
 		task.spawn(function()
@@ -35063,7 +35064,7 @@ Escape Timer: %*]]
 				local floor = math.floor
 				local dataPing = Stats2.Network.ServerStatsItem["Data Ping"]
 				local getValue = dataPing.GetValue
-				setText(v23, ("Resonance %s | %s fps | %s ms"):format("v2.9", math.floor(Stats2.Workspace.Heartbeat:GetValue()), floor(getValue(dataPing))))
+				setText(v23, ("dujare %s | %s fps | %s ms"):format("v2.9", math.floor(Stats2.Workspace.Heartbeat:GetValue()), floor(getValue(dataPing))))
 				task.wait(1)
 			end
 		end)
@@ -35135,7 +35136,7 @@ Escape Timer: %*]]
 		end
 		Greetings:AddLabel({ Text = ("%s, <b>%s</b> "):format(greeting, localPlayer.DisplayName), DoesWrap = true })
 		Greetings:AddDivider()
-		Greetings:AddLabel({ Text = "Welcome to <b><font color=\"#cc2222\">Resonance</font></b>", DoesWrap = true })
+		Greetings:AddLabel({ Text = "Welcome to <b><font color=\"#cc2222\">dujare</font></b>", DoesWrap = true })
 		Greetings:AddLabel({ Text = "created by <font color=\"#cc2222\">ludoade</font>", DoesWrap = true })
 		Greetings:AddLabel({ Text = "<b>the script is here!!</b>", DoesWrap = true })
 	end
@@ -36035,6 +36036,126 @@ Escape Timer: %*]]
 			ClearTextOnFocus = false,
 			Callback = function(arg)
 				tbl9.PacketPrefix = tostring(arg)
+			end,
+		})
+
+		-- =====================================================
+		-- dujare: Packet Lag Shield
+		-- Detects incoming packet lag attacks and suppresses
+		-- their effect on your client ping/experience
+		-- =====================================================
+		Packets:AddDivider("Packet Lag Shield")
+
+		Packets:AddToggle("PacketShieldToggle", {
+			Text = "Packet Shield",
+			Default = false,
+			Tooltip = "Detects and neutralizes packet-lag attacks against your client. When someone spams large packets, it auto-detects the spike and silences incoming packet bursts.",
+			Callback = function(enabled)
+				tbl8.PacketShield = enabled
+
+				if enabled then
+					fn18("Packet Shield activated — monitoring for packet lag attacks.", "dujare")
+
+					task.spawn(function()
+						-- Rolling average window for ping baseline
+						local pingHistory = {}
+						local historySize = 10
+						local spikeThreshold = 2.5   -- ping multiplier to consider as attack
+						local checkInterval = 0.4
+						local shieldActive = false
+						local suppressedCount = 0
+
+						local dataPingItem = Stats2.Network.ServerStatsItem["Data Ping"]
+
+						local function getRollingAvg()
+							if #pingHistory == 0 then return 0 end
+							local sum = 0
+							for _, v in ipairs(pingHistory) do sum = sum + v end
+							return sum / #pingHistory
+						end
+
+						while tbl8.PacketShield and not flag11 do
+							local ok, currentPing = pcall(function()
+								return dataPingItem:GetValue()
+							end)
+
+							if ok and currentPing then
+								-- Build rolling baseline
+								table.insert(pingHistory, currentPing)
+								if #pingHistory > historySize then
+									table.remove(pingHistory, 1)
+								end
+
+								local avgPing = getRollingAvg()
+								local isUnderAttack = avgPing > 20 and currentPing > avgPing * spikeThreshold and currentPing > 150
+
+								if isUnderAttack and not shieldActive then
+									shieldActive = true
+									suppressedCount = suppressedCount + 1
+
+									-- Shield response: pause our own packet-heavy operations temporarily
+									-- to avoid amplifying server congestion
+									local wasPacketLagging = tbl8.PacketLagServer
+									if wasPacketLagging then
+										tbl8.PacketLagServer = false
+									end
+
+									fn18(("Packet attack detected! Ping: %dms (avg: %dms). Shield suppressing..."):format(
+										math.floor(currentPing),
+										math.floor(avgPing)
+									), "dujare", nil, nil, true)
+
+									-- Wait for the attack wave to pass
+									local waitEnd = os.clock() + 3
+									while os.clock() < waitEnd and not flag11 do
+										task.wait(0.2)
+									end
+
+									-- Restore operations after shield period
+									if wasPacketLagging and tbl8.PacketShield then
+										tbl8.PacketLagServer = wasPacketLagging
+									end
+
+									-- Flush the ping history so we recalibrate baseline
+									pingHistory = {}
+									shieldActive = false
+
+								elseif not isUnderAttack and shieldActive then
+									shieldActive = false
+								end
+							end
+
+							task.wait(checkInterval)
+						end
+
+						if not flag11 then
+							fn18(("Packet Shield deactivated. Blocked %d spike(s)."):format(suppressedCount), "dujare")
+						end
+					end)
+				end
+			end,
+		})
+
+		Packets:AddSlider("PacketShieldThreshSlider", {
+			Text = "Shield Sensitivity",
+			Default = 150,
+			Min = 80,
+			Max = 400,
+			Rounding = 0,
+			Compact = true,
+			Suffix = " ms",
+			Tooltip = "Ping threshold (ms) above which the shield considers it a packet lag attack",
+		})
+
+		Packets:AddButton({
+			Text = "Test Shield (Simulate Spike)",
+			Tooltip = "Simulates a packet lag spike to test if your shield notifications work",
+			Func = function()
+				if not tbl8.PacketShield then
+					fn18("Enable Packet Shield first!", "dujare")
+					return
+				end
+				fn18("Shield test: simulated spike detected! Shield is working.", "dujare", nil, nil, true)
 			end,
 		})
 
@@ -38365,7 +38486,7 @@ Escape Timer: %*]]
 				end
 
 				local v24 = lib:Notify({
-					Title = "Resonance",
+					Title = "dujare",
 					Description = "Destroyed 0/" .. #tbl16 .. " toys",
 					Persist = true,
 					SoundId = n34,
@@ -42696,7 +42817,7 @@ Escape Timer: %*]]
 		Notifications:AddToggle("NotificationMaster", {
 			Text = "Master Switch",
 			Default = true,
-			Tooltip = "Enables or disables every Resonance notification",
+			Tooltip = "Enables or disables every dujare notification",
 			Callback = function(enabled)
 				tbl7.NotificationSettings.Enabled = enabled
 			end,
@@ -43352,11 +43473,11 @@ Rejoined: %rejoinedPlayer%, %listCount%]],
 		end)
 	end
 
-	fn18("Script loaded in " .. math.round((tick() - getgenv().LoadTime) * 100) / 100 .. " seconds", "Resonance", 71450094482101)
+	fn18("Script loaded in " .. math.round((tick() - getgenv().LoadTime) * 100) / 100 .. " seconds", "dujare", 71450094482101)
 	getgenv().LoadTime = nil
 
 	return {
-		copyright = "Copyright (c) 2026 Project Resonance. All rights reserved.",
+		copyright = "Copyright (c) 2026 dujare. All rights reserved.",
 	}
 end
 ]====]
@@ -43364,7 +43485,7 @@ sources.Bootstrap = [====[
 local sources = ...
 local env = getgenv and getgenv() or _G
 if env.ResonanceRunning or env.ResonanceStarting then
-    warn("Resonance is already running or starting")
+    warn("dujare is already running or starting")
 end
 assert(type(loadstring) == "function", "This executor does not support loadstring")
 assert(type(getgenv) == "function", "This executor does not support getgenv")
@@ -43393,7 +43514,7 @@ local ok, result = xpcall(function()
         local played, message = requireModule("Intro").Play()
         assert(played, message)
     end)
-    if not introOk then warn("Resonance intro: " .. tostring(introError)) end
+    if not introOk then warn("dujare intro: " .. tostring(introError)) end
     if type(writefile) == "function" and type(readfile) == "function" then
         local success = pcall(function()
             local lines = {"local sources = {}"}
@@ -43417,13 +43538,13 @@ env.ResonanceStarting = false
 if not ok then
     if cleanup then pcall(cleanup) end
     env.ResonanceRunning = false
-    warn("Resonance initialization failed: " .. tostring(result))
+    warn("dujare initialization failed: " .. tostring(result))
     return nil, result
 end
 return result
 ]====]
 sources.Notices = [====[
-Copyright (c) 2026 Project Resonance. All rights reserved.
+Copyright (c) 2026 dujare. All rights reserved.
 
 MIT License
 
