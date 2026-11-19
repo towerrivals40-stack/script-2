@@ -30216,6 +30216,7 @@ end
 			end
 
 			kickServerState.Running = false
+			tbl9.KickFlags = 0 -- [dujare] clear flags accumulated during LineLag
 
 			if not ok then
 				warn("[dujare] Target Kick Server failed: " .. tostring(result))
@@ -33815,6 +33816,12 @@ Escape Timer: %*]]
 							tbl9.KickFlags = 1
 						else
 							tbl9.KickFlags = tbl9.KickFlags + 1
+						end
+
+						-- [dujare] Suppress AutoReset during KickServer (LineLag intentionally
+						-- causes "Flying" flags on our own character — false positive).
+						if tbl7.KickServerState and tbl7.KickServerState.Running then
+							return
 						end
 
 						if tbl8.AutoReset then
