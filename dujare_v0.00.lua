@@ -29860,7 +29860,7 @@ end
 						local flag13 = parent and v27 and v27.Parent and v25.Health > 0 and v28.Health > 0 and not tbl12.IsNetworkOwner(v27)
 
 						if flag13 then
-							flag13 = tick() - now3 < (arg2 or 0.7)
+							flag13 = tick() - now3 < (arg2 or 0.35) -- [dujare] reduced from 0.7s
 						end
 
 						if flag13 then
@@ -29871,9 +29871,9 @@ end
 								cframe2 = v29 - Vector3.new(0, 15, 0)
 							end
 
-							task.wait(0.011111111111111112)
+							RunService.Heartbeat:Wait() -- [dujare] heartbeat
 							v22.CreatureGrab:FireServer(nil, v27, v22.RightWeld)
-							task.wait(0.011111111111111112)
+							RunService.Heartbeat:Wait() -- [dujare] heartbeat
 							v22.CreatureRelease:FireServer(v22.RightWeld)
 							continue
 						end
@@ -29962,7 +29962,7 @@ end
 			-- Poll until every target is within grab range OR 0.3s max.
 			-- This is faster than flat 0.35s when ping/physics is cooperative.
 			do
-				local deadline = os.clock() + 0.3
+				local deadline = os.clock() + 0.12 -- [dujare] was 0.3s
 				local grabRange = 22 -- studs — blob grab range buffer
 				local allReady = false
 				while os.clock() < deadline do
@@ -30012,7 +30012,7 @@ end
 				end
 			end
 
-			local n36 = os.clock() + 1.8 -- dujare: 1.8s (original 2s, safe minimum for creature grab physics)
+			local n36 = os.clock() + 0.9 -- [dujare] was 1.8s, 0.9s = safe min for server-side grab registration
 
 			while true do
 				for _, v26 in ipairs(tbl16) do
@@ -30182,7 +30182,7 @@ end
 			end)
 
 			task.spawn(function()
-				local n36 = os.clock() + 3 -- restored: needed for Heartbeat position lock
+				local n36 = os.clock() + 1.5 -- [dujare] was 3s — position lock, 1.5s sufficient at max lag
 
 				while not flag11 and os.clock() < n36 do
 					RunService.Heartbeat:Wait()
@@ -30194,7 +30194,7 @@ end
 				end
 			end)
 
-			task.wait(0.15) -- restored: needed before RNO calls
+			task.wait(0.08) -- [dujare] was 0.15s → 0.08s
 
 			for _, v22 in ipairs(tbl17) do
 				if v22.Parent then
@@ -30208,7 +30208,7 @@ end
 				end
 			end
 
-			task.wait(5) -- dujare: reduced from 6s → 5s (LineLag at max=11 is aggressive enough)
+			task.wait(2) -- [dujare] was 5s → 2s: at LineLag=11 (max), 2s is enough for server to register
 
 			if not flag11 then
 				toggles.LineLagToggle:SetDisabled(false)
